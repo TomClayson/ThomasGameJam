@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: dirt
-  m_Shader: {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 126d31c8664cef84e9919a667d08f983, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:
@@ -25,4 +25,4 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .588235319, g: .392156869, b: .117647059, a: 1}
+        second: {r: .308823526, g: .216941789, b: .0476859957, a: 1}

@@ -25,20 +25,18 @@ public class WorldMgr : MonoBehaviour {
 
 			Vector3 pos = Vector3.zero;
 			for(int i=0; i<5; i++){
+				Vector3 oldPos = pos;
+				Vector3 olddirect = direction;
 				direction = Quaternion.Euler(Random.Range(-1,1)*90, Random.Range(-1,1)*90, Random.Range(-1,1)*90) *direction;
-				pos += direction*10;
-				MakeTunnel(pos-direction*5);
+				pos += olddirect*10;
+				if (direction!=olddirect)	pos += direction*10;
+				MakeTunnel(olddirect, oldPos, pos);
 			}
 		}
 
 		//place minerals
 		for (int i=0; i<5; i++){
 			Vector3 pos = new Vector3(Random.Range(-2,2), Random.Range(-2,2), Random.Range(-2,2))*10;
-			switch(Random.Range(0,3)){
-			case 0:	pos.x += Random.Range(0,1)*10-5;	break;
-			case 1:	pos.y += Random.Range(0,1)*10-5;	break;
-			case 2:	pos.z += Random.Range(0,1)*10-5;	break;
-			}
 			bool validMin = true;
 			foreach(Minerals mineral in minerals){
 				if (mineral.transform.position==pos){
@@ -57,15 +55,11 @@ public class WorldMgr : MonoBehaviour {
 		}
 	}
 
-	public static Tunnel MakeTunnel(Vector3 tunnelPos){
-		if (Tunnel.FindTunnel(tunnelPos))	return null;
+	public static Tunnel MakeTunnel(Vector3 direct, Vector3 start, Vector3 end){
+		if (Tunnel.Find(start, end))	return null;
 		Tunnel newTunnel = ((GameObject)Instantiate(local.tunnelPrefab)).GetComponent<Tunnel>();
 		newTunnel.transform.parent = local.transform;
-		newTunnel.transform.position = tunnelPos;
-
-		if (Mathf.Abs(tunnelPos.z - Mathf.Round(tunnelPos.z/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(0,0,0);
-		if (Mathf.Abs(tunnelPos.y - Mathf.Round(tunnelPos.y/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(90,0,0);
-		if (Mathf.Abs(tunnelPos.x - Mathf.Round(tunnelPos.x/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(0,90,0);
+		newTunnel.SetPos(direct,start,end);
 		return newTunnel;
 	}
 

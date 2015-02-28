@@ -24,7 +24,41 @@ public class Train : MonoBehaviour {
 	}
 
 	void Update(){
-		float speed = Time.deltaTime*10;
+		if (target!=transform.position){
+			float dist = (target-transform.position).magnitude;
+			if (dist<0.1f){
+				transform.position = target;
+			}else{
+				float speed = Time.deltaTime*10;
+				float maxR = speed/10 /3.1415f*180f;
+				transform.rotation = Quaternion.RotateTowards(transform.rotation,
+				                                              Quaternion.LookRotation(target-transform.position),
+			                                                  maxR);
+				transform.Translate(0,0,speed);
+			}
+		}else{
+			for(int i=0; i<6; i++){
+				Vector3 dir = Vector3.up;
+				switch(i){
+				case 0:	dir = Vector3.up;		break;
+				case 1:	dir = Vector3.down;		break;
+				case 2:	dir = Vector3.right;	break;
+				case 3:	dir = Vector3.left;		break;
+				case 4:	dir = Vector3.forward;	break;
+				case 5:	dir = Vector3.back;		break;
+				}
+				if ((dir-transform.forward).sqrMagnitude<0.1f){
+					transform.rotation = Quaternion.LookRotation(dir);
+				}
+				Vector3 pos = transform.position;
+				pos.x = Mathf.Round(pos.x);
+				pos.y = Mathf.Round(pos.y);
+				pos.z = Mathf.Round(pos.z);
+				transform.position = pos;
+			}
+		}
+
+/*		float speed = Time.deltaTime*10;
 		Vector3 pos = transform.position;
 		if ((target-pos).sqrMagnitude<0.1f){
 			pos = target;
@@ -60,7 +94,7 @@ public class Train : MonoBehaviour {
 		pos.x = Mathf.Round(pos.x*10f)/10f;
 		pos.y = Mathf.Round(pos.y*10f)/10f;
 		pos.z = Mathf.Round(pos.z*10f)/10f;
-		transform.position = pos;
+		transform.position = pos;*/
 
 		if (markers.Count==0 && CameraMgr.selected==gameObject)	Select();
 		if (CameraMgr.selected!=gameObject)	Deselect();
@@ -75,13 +109,12 @@ public class Train : MonoBehaviour {
 		if (moves<=0)	return;
 		//place movement spheres
 		for (int i=0; i<5; i++) {
-			Vector3 pos = transform.position + transform.forward * 5;
+			Vector3 pos = transform.position + transform.forward * 10;
 			switch(i){
-			case 0:		pos += transform.forward * 5;	break;
-			case 1:		pos += transform.up * 5;		break;
-			case 2:		pos += -transform.up * 5;		break;
-			case 3:		pos += transform.right * 5;		break;
-			case 4:		pos += -transform.right * 5;	break;
+			case 1:		pos += transform.up * 10;		break;
+			case 2:		pos += -transform.up * 10;		break;
+			case 3:		pos += transform.right * 10;	break;
+			case 4:		pos += -transform.right * 10;	break;
 			}
 			if (ValidMovePos(pos)) {
 				Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
@@ -102,8 +135,8 @@ public class Train : MonoBehaviour {
 	}
 
 	bool ValidMovePos(Vector3 pos){
-		if (mode==Mode.Tunneler)	return true;
-		if (Tunnel.FindTunnel(pos)!=null)	return true;
+		//if (mode==Mode.Tunneler)	return true;
+		if (Tunnel.Find(transform.position, pos, transform.forward)!=null)	return true;
 		return false;
 	}
 
