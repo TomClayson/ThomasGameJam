@@ -7,9 +7,9 @@ public class WorldMgr : MonoBehaviour {
 	public GameObject tunnelPrefab = null;
 	public GameObject mineralsPrefab = null;
 
-	List<Transform> tunnels = new List<Transform>();
-	List<Transform> hubs = new List<Transform>();
-	List<Transform> minerals = new List<Transform>();
+	public static List<Tunnel> tunnels = new List<Tunnel>();
+	public static List<Transform> hubs = new List<Transform>();
+	public static List<Minerals> minerals = new List<Minerals>();
 
 	public Material[] minMats;
 	public static WorldMgr local;
@@ -49,17 +49,17 @@ public class WorldMgr : MonoBehaviour {
 				//check no tunnels here
 				Vector3 tunnelPos = pos-direction*5;
 				bool validTunnel = true;
-				foreach(Transform tunnel in hubs){
-					if (tunnel.position==tunnelPos){
+				foreach(Tunnel tunnel in tunnels){
+					if (tunnel.transform.position==tunnelPos){
 						validTunnel=false;
 						break;
 					}
 				}
 				if (validTunnel){
-					Transform newTunnel = ((GameObject)Instantiate(tunnelPrefab)).transform;
-					newTunnel.parent = transform;
-					newTunnel.position = tunnelPos;
-					newTunnel.rotation = Quaternion.LookRotation(direction);
+					Tunnel newTunnel = ((GameObject)Instantiate(tunnelPrefab)).GetComponent<Tunnel>();
+					newTunnel.transform.parent = transform;
+					newTunnel.transform.position = tunnelPos;
+					newTunnel.transform.rotation = Quaternion.LookRotation(direction);
 					tunnels.Add(newTunnel);
 				}
 			}
@@ -69,20 +69,18 @@ public class WorldMgr : MonoBehaviour {
 		for (int i=0; i<5; i++){
 			Vector3 pos = new Vector3(Random.Range(-2,2), Random.Range(-2,2), Random.Range(-2,2)) *10;
 			bool validMin = true;
-			foreach(Transform mineral in minerals){
-				if (mineral.position==pos){
+			foreach(Minerals mineral in minerals){
+				if (mineral.transform.position==pos){
 					validMin=false;
 					break;
 				}
 			}
 			if (validMin){
-				Transform newMin = ((GameObject)Instantiate(mineralsPrefab)).transform;
-				newMin.parent = transform;
-				newMin.position = pos;
-				Minerals min = newMin.GetComponent<Minerals>();
-				int mineType = Random.Range(0,Minerals.oresNumber);
-				min.ore = (Minerals.Ores)mineType;
-				min.amount = Random.Range(100,200);
+				Minerals newMin = ((GameObject)Instantiate(mineralsPrefab)).GetComponent<Minerals>();;
+				newMin.transform.parent = transform;
+				newMin.transform.position = pos;
+				newMin.ore = (Minerals.Ores)Random.Range(0,Minerals.oresNumber);
+				newMin.amount = Random.Range(100,200);
 				minerals.Add(newMin);
 			}
 		}
