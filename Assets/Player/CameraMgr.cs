@@ -42,6 +42,9 @@ public class CameraMgr : MonoBehaviour {
 				if (selected.GetComponent<Train>()!=null){
 					selected.GetComponent<Train>().Select();
 				}
+				if (selected.GetComponent<Marker>()!=null){
+					selected.GetComponent<Marker>().Select();
+				}
 			}
 		}
 	}
