@@ -3,12 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldMgr : MonoBehaviour {
-	public GameObject hubPrefab = null;
 	public GameObject tunnelPrefab = null;
 	public GameObject mineralsPrefab = null;
-
-	public static List<Tunnel> tunnels = new List<Tunnel>();
-	public static List<Transform> hubs = new List<Transform>();
+	
 	public static List<Minerals> minerals = new List<Minerals>();
 
 	public Material[] minMats;
@@ -30,38 +27,7 @@ public class WorldMgr : MonoBehaviour {
 			for(int i=0; i<5; i++){
 				direction = Quaternion.Euler(Random.Range(-1,1)*90, Random.Range(-1,1)*90, Random.Range(-1,1)*90) *direction;
 				pos += direction*10;
-
-				//check no hubs there
-				bool validHub = true;
-				foreach(Transform hub in hubs){
-					if (hub.position==pos){
-						validHub=false;
-						break;
-					}
-				}
-				if (validHub){
-					Transform newHub = ((GameObject)Instantiate(hubPrefab)).transform;
-					newHub.parent = transform;
-					newHub.position = pos;
-					hubs.Add(newHub);
-				}
-
-				//check no tunnels here
-				Vector3 tunnelPos = pos-direction*5;
-				bool validTunnel = true;
-				foreach(Tunnel tunnel in tunnels){
-					if (tunnel.transform.position==tunnelPos){
-						validTunnel=false;
-						break;
-					}
-				}
-				if (validTunnel){
-					Tunnel newTunnel = ((GameObject)Instantiate(tunnelPrefab)).GetComponent<Tunnel>();
-					newTunnel.transform.parent = transform;
-					newTunnel.transform.position = tunnelPos;
-					newTunnel.transform.rotation = Quaternion.LookRotation(direction);
-					tunnels.Add(newTunnel);
-				}
+				MakeTunnel(pos-direction*5);
 			}
 		}
 
@@ -89,6 +55,18 @@ public class WorldMgr : MonoBehaviour {
 				minerals.Add(newMin);
 			}
 		}
+	}
+
+	public static Tunnel MakeTunnel(Vector3 tunnelPos){
+		if (Tunnel.FindTunnel(tunnelPos))	return null;
+		Tunnel newTunnel = ((GameObject)Instantiate(local.tunnelPrefab)).GetComponent<Tunnel>();
+		newTunnel.transform.parent = local.transform;
+		newTunnel.transform.position = tunnelPos;
+
+		if (Mathf.Abs(tunnelPos.z - Mathf.Round(tunnelPos.z/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(0,0,0);
+		if (Mathf.Abs(tunnelPos.y - Mathf.Round(tunnelPos.y/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(90,0,0);
+		if (Mathf.Abs(tunnelPos.x - Mathf.Round(tunnelPos.x/10)*10)>1f) newTunnel.transform.rotation = Quaternion.Euler(0,90,0);
+		return newTunnel;
 	}
 
 	void Update(){

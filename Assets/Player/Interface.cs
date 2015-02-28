@@ -15,7 +15,18 @@ public class Interface : MonoBehaviour {
 		GUILayout.Box ("Turn " + Player.turn.ToString ());
 		if (GUILayout.Button ("Next Turn")) {
 			Player.NextTurn();
+			foreach(Tunnel tunnel in Tunnel.tunnels)	tunnel.NextTurn();
+			foreach(Train train in Train.trains)		train.NextTurn();
+
+			for(int i=Tunnel.tunnels.Count-1; i>=0; i--)
+				if (Tunnel.tunnels[i]==null)	Tunnel.tunnels.RemoveAt(i);
+			Tunnel.tunnels.TrimExcess();
+			for(int i=Train.trains.Count-1; i>=0; i--)
+				if (Train.trains[i]==null)	Train.trains.RemoveAt(i);
+			Train.trains.TrimExcess();
+
 		}
+		Debug.Log(Tunnel.tunnels.Count);
 
 		GUILayout.EndArea ();
 	}

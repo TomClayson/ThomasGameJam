@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Train : MonoBehaviour {
+	public static List<Train> trains = new List<Train>();
+
 	public GameObject markerPrefab = null;
 	List<Marker> markers = new List<Marker>();
 
@@ -11,24 +13,32 @@ public class Train : MonoBehaviour {
 	public int moves = 1;
 	public int totalMoves = 1;
 
-	public enum Mode {Tunneler, Miner, Builder, Assault};
+	public enum Mode {Tunneler, Builder, Assault};
 	public Mode mode = Mode.Tunneler;
 
 	public Vector3 target = Vector3.zero;
-
+	
 	void Start(){
+		trains.Add(this);
 		target = transform.position;
 	}
 
 	void Update(){
 		float speed = Time.deltaTime*10;
 		Vector3 pos = transform.position;
-		if (target!=pos){
+		if ((target-pos).sqrMagnitude<0.1f){
+			pos = target;
+		}else{
 			float mag = (transform.forward-target-pos).magnitude;
 			float dot = Vector3.Dot(transform.forward, (target-pos).normalized);
-			if (pos.x%10!=0 || pos.y%10!=0 || pos.z%10!=0){
-				pos += transform.forward*Mathf.Min(mag,speed);
+			float dotmag = Vector3.Dot(transform.forward, target-pos);
+			float dx = pos.x - Mathf.Round(pos.x/10)*10;
+			float dy = pos.y - Mathf.Round(pos.y/10)*10;
+			float dz = pos.z - Mathf.Round(pos.z/10)*10;
+			if ( Mathf.Abs(dx)>0.01f || Mathf.Abs(dy)>0.01f || Mathf.Abs(dz)>0.01f){
+				pos += transform.forward*Mathf.Min(dotmag,speed);
 			}else{
+				//rotate
 				if (dot<1){
 					transform.rotation = Quaternion.RotateTowards(transform.rotation,
 				                                              Quaternion.LookRotation(target-pos),
@@ -36,9 +46,11 @@ public class Train : MonoBehaviour {
 				}else{
 					pos += transform.forward*Mathf.Min(mag,speed);
 				}
+
+				//new tunnel
+				if (Tunnel.FindTunnel(target)==null)	WorldMgr.MakeTunnel(target);
 			}
 		}
-		Debug.Log(transform.forward.x.ToString()+" "+transform.forward.y.ToString()+" "+transform.forward.z.ToString());
 		Vector3 euler = transform.rotation.eulerAngles;
 		euler.x = Mathf.Round(euler.x);
 		euler.y = Mathf.Round(euler.y);
@@ -50,7 +62,8 @@ public class Train : MonoBehaviour {
 		pos.z = Mathf.Round(pos.z*10f)/10f;
 		transform.position = pos;
 
-		if (markers.Count>0 && CameraMgr.selected!=gameObject)	Deselect();
+		if (markers.Count==0 && CameraMgr.selected==gameObject)	Select();
+		if (CameraMgr.selected!=gameObject)	Deselect();
 	}
 
 	public void NextTurn(){
@@ -59,6 +72,7 @@ public class Train : MonoBehaviour {
 
 	public void Select(){
 		Deselect();
+		if (moves<=0)	return;
 		//place movement spheres
 		for (int i=0; i<5; i++) {
 			Vector3 pos = transform.position + transform.forward * 5;
@@ -80,6 +94,7 @@ public class Train : MonoBehaviour {
 	}
 
 	public void Deselect(){
+		if (markers.Count==0)	return;
 		foreach(Marker mark in markers){
 			Destroy(mark.gameObject);
 		}
@@ -87,9 +102,8 @@ public class Train : MonoBehaviour {
 	}
 
 	bool ValidMovePos(Vector3 pos){
-		foreach (Tunnel tunnel in WorldMgr.tunnels) {
-			if ((tunnel.transform.position-pos).sqrMagnitude<1f)		return true;
-		}
+		if (mode==Mode.Tunneler)	return true;
+		if (Tunnel.FindTunnel(pos)!=null)	return true;
 		return false;
 	}
 
@@ -99,4 +113,17 @@ public class Train : MonoBehaviour {
 		GUILayout.Box ("Moves " +moves.ToString()+ " / " + totalMoves.ToString());
 		GUILayout.Box (mode.ToString ());
 	}
+
+	/*
+	 * 
+	 * mining
+	 * mines resources
+	 * 
+	 * factory
+	 * builds new trains
+	 * 
+	 * colony
+	 * houses people - gives income? maybe
+	 * 
+	 */
 }
