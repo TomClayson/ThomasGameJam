@@ -14,11 +14,22 @@ public class Train : MonoBehaviour {
 	public enum Mode {Tunneler, Miner, Colonist, Assault};
 	public Mode mode = Mode.Tunneler;
 
+	Vector3 target = Vector3.zero;
+
+	void Start(){
+		target = transform.position;
+	}
+
+	void Update(){
+
+	}
+
 	public void NextTurn(){
 		moves = totalMoves;
 	}
 
 	public void Select(){
+		Deselect();
 		//place movement spheres
 		for (int i=0; i<5; i++) {
 			Vector3 pos = transform.position + transform.forward * 5;
@@ -31,10 +42,19 @@ public class Train : MonoBehaviour {
 			}
 			if (ValidMovePos(pos)) {
 				Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
+				newMark.train = this;
+				newMark.transform.position = pos;
 				markers.Add(newMark);
 			}
 		}
 
+	}
+
+	public void Deselect(){
+		foreach(Marker mark in markers){
+			Destroy(mark.gameObject);
+		}
+		markers.Clear();
 	}
 
 	bool ValidMovePos(Vector3 pos){

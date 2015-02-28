@@ -2,5 +2,8 @@
 using System.Collections;
 
 public class Marker : MonoBehaviour {
-	Train train = null;
+	public Train train = null;
+
+	public void Select(){
+	}
 }

@@ -8,6 +8,7 @@ public class CameraMgr : MonoBehaviour {
 	float ax = 45;
 	float ay = 45;
 	float zoom = 50f;
+	bool canClick = false;
 
 	const float mouseRotSens = 100;
 
@@ -30,11 +31,17 @@ public class CameraMgr : MonoBehaviour {
 		zoom -= Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*2000f;
 		zoom = Mathf.Clamp (zoom, 10, 100);
 
-		if (Input.GetMouseButton (0)) {
+		if (!Input.GetMouseButton(0))	canClick = true;
+
+		if (Input.GetMouseButton (0) && canClick) {
+			canClick = false;
 			Ray ray = camera.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit)){
 				selected = hit.collider.gameObject;
+				if (selected.GetComponent<Train>()!=null){
+					selected.GetComponent<Train>().Select();
+				}
 			}
 		}
 	}
