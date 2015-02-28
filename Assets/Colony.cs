@@ -2,9 +2,12 @@
 using System.Collections;
 
 public class Colony : MonoBehaviour {
+	public void Window(){
+		GUILayout.Box (name);
 
-
-	void Update(){
-	
+		GUILayout.Button("Tunneler");
+		GUILayout.Button("Miner");
+		GUILayout.Button("Colonist");
+		GUILayout.Button("Assault");
 	}
 }

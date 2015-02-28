@@ -11,6 +11,13 @@ public class WorldMgr : MonoBehaviour {
 	List<Transform> hubs = new List<Transform>();
 	List<Transform> minerals = new List<Transform>();
 
+	public Material[] minMats;
+	public static WorldMgr local;
+
+	void Awake(){
+		local = this;
+	}
+
 	void Start(){
 		Generate();
 	}
@@ -34,6 +41,7 @@ public class WorldMgr : MonoBehaviour {
 				}
 				if (validHub){
 					Transform newHub = ((GameObject)Instantiate(hubPrefab)).transform;
+					newHub.parent = transform;
 					newHub.position = pos;
 					hubs.Add(newHub);
 				}
@@ -49,6 +57,7 @@ public class WorldMgr : MonoBehaviour {
 				}
 				if (validTunnel){
 					Transform newTunnel = ((GameObject)Instantiate(tunnelPrefab)).transform;
+					newTunnel.parent = transform;
 					newTunnel.position = tunnelPos;
 					newTunnel.rotation = Quaternion.LookRotation(direction);
 					tunnels.Add(newTunnel);
@@ -68,13 +77,17 @@ public class WorldMgr : MonoBehaviour {
 			}
 			if (validMin){
 				Transform newMin = ((GameObject)Instantiate(mineralsPrefab)).transform;
+				newMin.parent = transform;
 				newMin.position = pos;
+				Minerals min = newMin.GetComponent<Minerals>();
+				int mineType = Random.Range(0,Minerals.oresNumber);
+				min.ore = (Minerals.Ores)mineType;
+				min.amount = Random.Range(100,200);
 				minerals.Add(newMin);
 			}
 		}
 	}
 
 	void Update(){
-		
 	}
 }
