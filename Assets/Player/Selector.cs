@@ -31,7 +31,7 @@ public class Selector : MonoBehaviour {
 	void SelectObject(){
 		Ray ray = camera.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit)){
+		if (Physics.Raycast(ray, out hit, 001111111)){
 			selected = hit.collider.gameObject;
 			if (selected.GetComponent<Train>()!=null){
 				selected.GetComponent<Train>().Select();

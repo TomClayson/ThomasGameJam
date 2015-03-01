@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class Minerals : MonoBehaviour {
+	public TextMesh hoverText;
 	public const int oresNumber = 10;
 	public enum Ores {
 		Steel,
@@ -51,12 +52,19 @@ public class Minerals : MonoBehaviour {
 	public float amount = 0;
 
 	void Start(){
-		foreach (Transform child in transform) {
-			child.transform.localPosition = Random.rotation*Vector3.up*Random.Range(1f,2f);
-			child.transform.localScale = new Vector3( Random.Range(1f,2f), Random.Range(1f,2f), Random.Range(1f,2f));
-			child.transform.localRotation = Random.rotation;
-			child.renderer.material = WorldMgr.local.minMats[(int)ore];
+		for(int i=0; i<transform.childCount; i++){
+			Transform child = transform.GetChild(i);
+			if (child.name!="HoverText"){
+				child.transform.localPosition = Random.rotation*Vector3.up*Random.Range(1f,2f);
+				child.transform.localScale = new Vector3( Random.Range(1f,2f), Random.Range(1f,2f), Random.Range(1f,2f));
+				child.transform.localRotation = Random.rotation;
+				child.renderer.material = WorldMgr.local.minMats[(int)ore];
+			}
 		}
+	}
+
+	void Update(){
+		hoverText.text = "          " + Mathf.FloorToInt (amount).ToString () + " " + ore.ToString ();
 	}
 
 	public void Window(){

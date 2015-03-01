@@ -10,9 +10,13 @@ public class CameraMgr : MonoBehaviour {
 
 	const float mouseRotSens = 100;
 
+	void Awake(){
+		Player.Init ();
+	}
+
 	void Update(){
 		if (Player.currentGameMode!=Player.GameMode.Design)
-			camera.backgroundColor = background.Evaluate(Mathf.Clamp01(focus.y/500+0.5f));
+			camera.backgroundColor = background.Evaluate(Mathf.Clamp01(1-focus.y/500));
 
 		if (Selector.selected != null) {
 			focus = Vector3.Lerp(focus, Selector.selected.transform.position, Time.deltaTime*10);

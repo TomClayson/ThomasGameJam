@@ -12,7 +12,7 @@ public class Tunnel : MonoBehaviour {
 	Vector3 normEnd = Vector3.forward;
 
 	void Start(){
-		life = Random.Range(5,15);
+		life = Random.Range(20,30);
 		tunnels.Add(this);
 	}
 

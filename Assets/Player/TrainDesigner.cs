@@ -34,7 +34,7 @@ public class TrainDesigner : MonoBehaviour {
 				carriages.Clear();
 				
 				Carriage ncar = ((GameObject)Instantiate(carriagePrefab)).GetComponent<Carriage>();
-				ncar.mode = Carriage.Mode.Tunneler;
+				ncar.mode = Carriage.Mode.Engine;
 				ncar.transform.parent = demoTrain.transform;
 				ncar.transform.localScale = Vector3.one*5f;
 				ncar.gameObject.layer = 8;
@@ -56,12 +56,14 @@ public class TrainDesigner : MonoBehaviour {
 		mineralCosts[(int)body] += 10*carriages.Count;
 
 		speed = 0;
+		armour = 5;
+		fuel = 5;
 		for(int i=0; i<carriages.Count; i++){
 			if (carriages[i].mode==Carriage.Mode.Engine)	speed += 20;
 			if (carriages[i].mode==Carriage.Mode.Cargo)		cargo += 20;
 			if (carriages[i].mode==Carriage.Mode.Fuel)		fuel += 5;
 		}
-		speed /= carriages.Count*Minerals.densities[(int)body];
+		speed /= (carriages.Count+1)*Minerals.densities[(int)body];
 		speed = Mathf.Clamp (speed, 1, 10);
 
 		cam.gameObject.SetActive(true);
@@ -168,6 +170,10 @@ public class TrainDesigner : MonoBehaviour {
 			GUILayout.Box("Torpedos\n" +
 			              "Strong weapons for defending trains and destroying others.");
 			break;
+		case Carriage.Mode.Builder:
+			GUILayout.Box("Builder\n" +
+			              "COnstruction unit capable of establishing new colonies.");
+			break;
 		}
 		if (GUILayout.Button("Add")){
 			Carriage ncar = ((GameObject)Instantiate(carriagePrefab)).GetComponent<Carriage>();
@@ -198,26 +204,53 @@ public class TrainDesigner : MonoBehaviour {
 		//cost
 		GUILayout.BeginVertical(GUILayout.Width(150));
 		GUILayout.FlexibleSpace();
-		GUILayout.Box("Total Cost");
+		GUILayout.Box("Speed: "+Mathf.FloorToInt(speed).ToString());
+		GUILayout.Box("Fuel: "+Mathf.FloorToInt(fuel).ToString());
+		GUILayout.Box("Cargo: "+Mathf.FloorToInt(cargo).ToString());
+		GUILayout.Box("Armour "+Mathf.FloorToInt(armour).ToString());
+
+		bool canBuild = true;
+		if (Player.wealth<wealthCost){
+			GUI.skin.box.normal.textColor = Color.red;
+			canBuild = false;
+		}
 		GUILayout.Box("$ "+Mathf.Round(wealthCost).ToString());
+		GUI.skin.box.normal.textColor = new Color (0.8f, 0.8f, 0.8f,1);
+
+
 		for(int i=0; i<mineralCosts.Length; i++) {
 			if (mineralCosts[i]>0){
+				if (Player.minerals[i]<mineralCosts[i]){
+					GUI.skin.box.normal.textColor = Color.red;
+					canBuild = false;
+				}
 				GUILayout.Box (Mathf.RoundToInt(mineralCosts[i]).ToString()+" "+((Minerals.Ores)i).ToString());
+				GUI.skin.box.normal.textColor = new Color (0.8f, 0.8f, 0.8f,1);
 			}
 		}
-		if (GUILayout.Button("BUILD")){
-			Player.currentGameMode = Player.GameMode.Game;
-			Train newTrain = ((GameObject)Instantiate(trainPrefab)).GetComponent<Train>();
-			newTrain.health = 0.1f;
-			newTrain.body = body;
-			newTrain.transform.position = Selector.selected.transform.position;
-			newTrain.totalMoves = (int)speed;
+		if (!canBuild) {
+			GUILayout.Box("Insufficient Resources");
+		}else{
+			if (GUILayout.Button("BUILD")){
+				Player.currentGameMode = Player.GameMode.Game;
+				Train newTrain = ((GameObject)Instantiate(trainPrefab)).GetComponent<Train>();
+				newTrain.health = 0.1f;
+				newTrain.maxfuel = fuel;
+				newTrain.body = body;
+				newTrain.transform.position = Selector.selected.transform.position;
+				newTrain.totalMoves = (int)speed;
+					
+				newTrain.carriages = new Carriage[carriages.Count];
+				for(int i=0; i<carriages.Count; i++){
+					newTrain.carriages[i] = ((GameObject)Instantiate(carriagePrefab)).GetComponent<Carriage>();
+					newTrain.carriages[i].transform.parent = newTrain.transform;
+					newTrain.carriages[i].mode = carriages[i].mode;
+				}
 
-			newTrain.carriages = new Carriage[carriages.Count];
-			for(int i=0; i<carriages.Count; i++){
-				newTrain.carriages[i] = ((GameObject)Instantiate(carriagePrefab)).GetComponent<Carriage>();
-				newTrain.carriages[i].transform.parent = newTrain.transform;
-				newTrain.carriages[i].mode = carriages[i].mode;
+				Player.wealth -= wealthCost;
+				for(int i=0; i<mineralCosts.Length; i++) {
+					Player.minerals[i]-=mineralCosts[i];
+				}
 			}
 		}
 		if (GUILayout.Button("Cancel")){

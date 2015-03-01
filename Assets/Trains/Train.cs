@@ -11,15 +11,20 @@ public class Train : MonoBehaviour {
 
 	public GameObject markerPrefab = null;
 	List<Marker> markers = new List<Marker>();
+	public GameObject torpedoPrefab = null;
 
 	public GameObject buildingPrefab = null;
 
 	public Minerals.Ores body = Minerals.Ores.Steel;
 	public float health = 1;
+	public float fuel = 0;
+	public float maxfuel = 10;
+	public float armour = 10;
 	public int moves = 1;
 	int miners = 0;
 	int tunnelers = 0;
 	int builders = 0;
+	int torpedos = 0;
 	public int totalMoves = 3;
 
 	public Carriage[] carriages;
@@ -37,12 +42,15 @@ public class Train : MonoBehaviour {
 				if (carriages[i].mode==Carriage.Mode.Miner)		miners++;
 				if (carriages[i].mode==Carriage.Mode.Tunneler)	tunnelers++;
 				if (carriages[i].mode==Carriage.Mode.Builder)	builders++;
+				if (carriages[i].mode==Carriage.Mode.Torpedos)	torpedos++;
 			}
 		}
 
 	}
 
 	void Update(){
+		fuel = Mathf.Clamp (fuel, 0f, 10000f);
+
 		//carriage manager
 		for (int i=0; i<carriages.Length; i++) {
 			if (carriages[i]!=null)		carriages[i].transform.localPosition = new Vector3(0,0,-i);
@@ -141,9 +149,14 @@ public class Train : MonoBehaviour {
 		}
 		return Vector3.up;
 	}
+
+	public void Damage(float dam){
+		health -= dam / armour;
+	}
 	
 	public void NextTurn(){
 		moves = totalMoves;
+		fuel--;
 
 		//mining
 		if (miners>0){
@@ -159,6 +172,7 @@ public class Train : MonoBehaviour {
 		}
 
 		//heal
+		fuel = maxfuel;
 		if (InBuilding())	health += 0.2f;
 		health = Mathf.Clamp01(health);
 	}
@@ -195,41 +209,91 @@ public class Train : MonoBehaviour {
 					Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
 					newMark.train = this;
 					newMark.transform.position = pos;
+					newMark.currentMode = Marker.Modes.Movement;
 					markers.Add(newMark);
 				}
 			}
-			return;
+		}else{
+
+			//place movement spheres
+			for (int i=0; i<10; i++) {
+				Quaternion oldrot = transform.rotation;
+				transform.rotation = Quaternion.LookRotation(normal);
+				Vector3 pos = position;
+				switch(i){
+				case 0:		pos += normal*10;						break;
+				case 1:		pos += normal*10 + transform.up*10;		break;
+				case 2:		pos += normal*10 - transform.up*10;		break;
+				case 3:		pos += normal*10 + transform.right*10;	break;
+				case 4:		pos += normal*10 - transform.right*10;	break;
+				case 5:		pos -= normal*10;						break;
+				case 6:		pos -= normal*10 + transform.up*10;		break;
+				case 7:		pos -= normal*10 - transform.up*10;		break;
+				case 8:		pos -= normal*10 + transform.right*10;	break;
+				case 9:		pos -= normal*10 - transform.right*10;	break;
+				}
+				transform.rotation = oldrot;
+				if (ValidMovePos(pos)) {
+					Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
+					newMark.train = this;
+					newMark.transform.position = pos;
+					newMark.currentMode = Marker.Modes.Movement;
+					markers.Add(newMark);
+
+				}
+			}
 		}
 
-		//place movement spheres
-		for (int i=0; i<10; i++) {
-			Quaternion oldrot = transform.rotation;
-			transform.rotation = Quaternion.LookRotation(normal);
-			Vector3 pos = position;
-			switch(i){
-			case 0:		pos += normal*10;						break;
-			case 1:		pos += normal*10 + transform.up*10;		break;
-			case 2:		pos += normal*10 - transform.up*10;		break;
-			case 3:		pos += normal*10 + transform.right*10;	break;
-			case 4:		pos += normal*10 - transform.right*10;	break;
-			case 5:		pos -= normal*10;						break;
-			case 6:		pos -= normal*10 + transform.up*10;		break;
-			case 7:		pos -= normal*10 - transform.up*10;		break;
-			case 8:		pos -= normal*10 + transform.right*10;	break;
-			case 9:		pos -= normal*10 - transform.right*10;	break;
-			}
-			transform.rotation = oldrot;
-			if (ValidMovePos(pos)) {
-				Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
-				newMark.train = this;
-				newMark.transform.position = pos;
-				newMark.currentMode = Marker.Modes.Movement;
-				markers.Add(newMark);
+		//place attack spheres
+		if (torpedos>0){
+			Debug.Log ("tops");
+			for (int i=0; i<18; i++) {
+				Vector3 pos = position;
+				switch(i){
+				case 0:		pos += Vector3.up*10;						break;
+				case 1:		pos += Vector3.up*10 + Vector3.right*10;	break;
+				case 2:		pos += Vector3.up*10 - Vector3.right*10;	break;
+				case 3:		pos += Vector3.up*10 + Vector3.forward*10;	break;
+				case 4:		pos += Vector3.up*10 - Vector3.forward*10;	break;
+				case 5:		pos += Vector3.down*10;						break;
+				case 6:		pos += Vector3.down*10 + Vector3.right*10;	break;
+				case 7:		pos += Vector3.down*10 - Vector3.right*10;	break;
+				case 8:		pos += Vector3.down*10 + Vector3.forward*10;break;
+				case 9:		pos += Vector3.down*10 - Vector3.forward*10;break;
+				case 10:	pos += Vector3.right*10;					break;
+				case 11:	pos += Vector3.left*10;						break;
+				case 12:	pos += Vector3.forward*10;					break;
+				case 13:	pos += Vector3.back*10;						break;
+				case 14:	pos += Vector3.right*10 + Vector3.back*10;	break;
+				case 15:	pos += Vector3.right*10 - Vector3.back*10;	break;
+				case 16:	pos += Vector3.left*10 + Vector3.back*10;	break;
+				case 17:	pos += Vector3.left*10 - Vector3.back*10;	break;
+				}
+				if (Monster.Find(pos)){
+					Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
+					newMark.train = this;
+					newMark.transform.position = pos;
+					newMark.currentMode = Marker.Modes.Attack;
+					markers.Add(newMark);
+				}
 			}
 		}
 
+		return;
 	}
 
+	public void FireTorpedo(Vector3 pos){
+		GameObject torp = (GameObject)Instantiate (torpedoPrefab);
+		torp.transform.position = transform.position;
+		torp.transform.rotation = Quaternion.LookRotation (pos - transform.position);
+		torp.GetComponent<Bullet>().target = pos;
+
+		Monster mon = Monster.Find (pos);
+		if (mon != null) {
+			mon.Damage (torpedos);
+		}
+	}
+	
 	public void Deselect(){
 		if (markers.Count==0)	return;
 		foreach(Marker mark in markers){
@@ -246,7 +310,9 @@ public class Train : MonoBehaviour {
 	}
 
 	bool ValidMovePos(Vector3 pos){
-		if (Find(pos))	return false;
+		if (fuel <= 0)	return false;
+		if (Find(pos)!=null)	return false;
+		if (Monster.Find(pos)!=null)	return false;
 		if (tunnelers>0)	return true;
 		if (Tunnel.Find(position, pos, normal)!=null)	return true;
 		if (Tunnel.Find(position, pos, -normal)!=null)	return true;
@@ -254,7 +320,9 @@ public class Train : MonoBehaviour {
 	}
 
 	bool ValidMoveBuilding(Vector3 pos){
-		if (Find(pos))	return false;
+		if (fuel <= 0)	return false;
+		if (Find(pos)!=null)	return false;
+		if (Monster.Find(pos)!=null)	return false;
 		if (tunnelers>0)	return true;
 		if (Tunnel.Find(position, pos)!=null)	return true;
 		if (Tunnel.Find(position, pos)!=null)	return true;
@@ -274,8 +342,9 @@ public class Train : MonoBehaviour {
 		GUILayout.BeginVertical(GUILayout.Width(200));
 		GUILayout.FlexibleSpace();
 		GUILayout.Box (name);
-		GUILayout.Box ("Health "+Mathf.Floor(health*100).ToString());
-		GUILayout.Box ("Moves " +moves.ToString()+ " / " + totalMoves.ToString());
+		GUILayout.Box ("Health: "+Mathf.Floor(health*100).ToString()+"%");
+		GUILayout.Box ("Fuel: "+Mathf.Floor(fuel/maxfuel*100).ToString()+"%");
+		GUILayout.Box ("Moves: " +moves.ToString()+ " / " + totalMoves.ToString());
 		if (builders>0){
 			if (GUILayout.Button("Build Colony")){
 				Building build = ((GameObject)Instantiate(buildingPrefab)).GetComponent<Building>();
@@ -295,7 +364,9 @@ public class Train : MonoBehaviour {
 		GUILayout.BeginVertical(GUILayout.Width(150));
 		GUILayout.FlexibleSpace();
 		for (int i=0; i<carriages.Length; i++) {
-			GUILayout.Box(carriages[i].mode.ToString());
+			if (carriages[i]!=null){
+				GUILayout.Box(carriages[i].mode.ToString());
+			}
 		}
 		GUILayout.EndVertical();
 		GUILayout.EndHorizontal ();

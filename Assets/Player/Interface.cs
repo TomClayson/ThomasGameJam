@@ -22,22 +22,42 @@ public class Interface : MonoBehaviour {
 		GUILayout.BeginArea (new Rect (Screen.width-200, 0, 200, Screen.height));
 		GUILayout.Box ("Turn " + Player.turn.ToString ());
 		if (GUILayout.Button ("Next Turn")) {
+			WorldMgr.NextTurn();
+			Selector.selected = null;
 			Player.NextTurn();
 
-			foreach(Tunnel tunnel in Tunnel.tunnels)	tunnel.NextTurn();
-			for(int i=Tunnel.tunnels.Count-1; i>=0; i--)
-				if (Tunnel.tunnels[i]==null)	Tunnel.tunnels.RemoveAt(i);
+			for(int i=Tunnel.tunnels.Count-1; i>=0; i--){
+				if (Tunnel.tunnels[i]==null)
+					Tunnel.tunnels.RemoveAt(i);
+				else
+					Tunnel.tunnels[i].NextTurn();
+			}
 			Tunnel.tunnels.TrimExcess();
 
-			foreach(Train train in Train.trains)		train.NextTurn();
-			for(int i=Train.trains.Count-1; i>=0; i--)
-				if (Train.trains[i]==null)	Train.trains.RemoveAt(i);
+			for(int i=Train.trains.Count-1; i>=0; i--){
+				if (Train.trains[i]==null)
+					Train.trains.RemoveAt(i);
+				else
+					Train.trains[i].NextTurn();
+			}
 			Train.trains.TrimExcess();
 
-			foreach(Building build in Building.buildings)		build.NextTurn();
-			for(int i=Building.buildings.Count-1; i>=0; i--)
-				if (Building.buildings[i]==null)	Building.buildings.RemoveAt(i);
+			for(int i=Building.buildings.Count-1; i>=0; i--){
+				if (Building.buildings[i]==null)
+					Building.buildings.RemoveAt(i);
+				else
+					Building.buildings[i].NextTurn();
+			}
 			Building.buildings.TrimExcess();
+
+			for(int i=Monster.monsters.Count-1; i>=0; i--){
+				if (Monster.monsters[i]==null)
+					Monster.monsters.RemoveAt(i);
+				else
+					Monster.monsters[i].NextTurn();
+			}
+			Monster.monsters.TrimExcess();
+
 		}
 		GUILayout.FlexibleSpace();
 		GUILayout.EndArea ();

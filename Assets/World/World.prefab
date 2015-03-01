@@ -40,6 +40,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tunnelPrefab: {fileID: 127146, guid: 18f151a53dbecd74f87bfab7b1bf72fe, type: 2}
   mineralsPrefab: {fileID: 100010, guid: 8a89428017e41bc4aa7207ab4fc97e6b, type: 2}
+  monsterPrefab: {fileID: 100000, guid: 0663bd3ae16418a439a630e3d3db11ef, type: 2}
   minMats:
   - {fileID: 2100000, guid: 7b9bf989982a93c48b5ae65b4e4c4c9a, type: 2}
   - {fileID: 2100000, guid: 7d5ada9ae69a4224a872de06cd5e3f2e, type: 2}

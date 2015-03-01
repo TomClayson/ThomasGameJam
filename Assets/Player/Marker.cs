@@ -16,8 +16,19 @@ public class Marker : MonoBehaviour {
 
 	public void Select(){
 		Selector.selected = train.gameObject;
-		train.target = transform.position;
-		train.moves--;
+
+		switch(currentMode){
+		case Modes.Movement:
+			train.target = transform.position;
+			train.moves--;
+			break;
+		case Modes.Attack:
+			train.FireTorpedo(transform.position);
+			train.moves--;
+			break;
+		}
+
+
 		train.Deselect();
 	}
 }

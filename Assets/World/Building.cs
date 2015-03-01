@@ -6,6 +6,7 @@ public class Building : MonoBehaviour {
 	public static List<Building> buildings = new List<Building>();
 	float health = 1;
 	float population = 100;
+	float armour = 25;
 
 	void Start(){
 		buildings.Add(this);
@@ -29,7 +30,7 @@ public class Building : MonoBehaviour {
 		foreach(Train train in Train.trains){
 			if (train!=null){
 				if ((train.transform.position-transform.position).sqrMagnitude<1){
-					if (GUILayout.Button(train.name+" "+Mathf.RoundToInt(train.health*100)+"%")){
+					if (GUILayout.Button(train.name+" "+Mathf.RoundToInt(train.health*100)+"% "+train.moves+"/"+train.totalMoves)){
 						Selector.selected = train.gameObject;
 					}
 				}
@@ -41,7 +42,11 @@ public class Building : MonoBehaviour {
 
 	public void NextTurn(){
 		population += Random.Range(100,200);
-		health = Mathf.Clamp01(health+0.1f);
+		//health = Mathf.Clamp01(health+0.1f);
 		Player.wealth += population/10f;
+	}
+
+	public void Damage(float dam){
+		health -= dam / armour;
 	}
 }

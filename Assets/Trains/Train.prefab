@@ -41,12 +41,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0, z: 0}
   markerPrefab: {fileID: 100002, guid: 8f8df938c73cfc743a37784eb664db1d, type: 2}
+  torpedoPrefab: {fileID: 100000, guid: becc14aa74c967f4f962e4cb6820d5d5, type: 2}
   buildingPrefab: {fileID: 100002, guid: 6427297b4d84ffd4a93c7db629567678, type: 2}
   body: 0
   health: 1
+  fuel: 0
+  maxfuel: 10
+  armour: 10
   moves: 1
   totalMoves: 3
-  mode: 0
   carriages:
   - {fileID: 0}
   - {fileID: 0}
