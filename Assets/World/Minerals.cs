@@ -2,8 +2,43 @@
 using System.Collections;
 
 public class Minerals : MonoBehaviour {
-	public const int oresNumber = 6;
-	public enum Ores {Steel, Gold, Uranium, Lead, Aluminium, Tungsten};
+	public const int oresNumber = 10;
+	public enum Ores {
+		Steel,
+		Gold,
+		Uranium,
+		Lead,
+		Aluminium,
+		Tungsten,
+		Copper,
+		Titanium,
+		Chromium,
+		Diamond
+	};
+	public static float[] MeltingPoints = new float[]{
+		1370,
+		1060,
+		1400,
+		330,
+		660,
+		3420,
+		1670,
+		1910,
+		4440
+	};
+	public static float[] densities = new float[]{
+		8,
+		20,
+		19,
+		10,
+		3,
+		19,
+		9,
+		4,
+		7,
+		3.5f
+	};
+
 	//iron = basic
 	//gold = money
 	//uranium = power colonies nuclear bombs

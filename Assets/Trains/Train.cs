@@ -22,6 +22,9 @@ public class Train : MonoBehaviour {
 	public enum Mode {Tunneler, Miner, Builder, Assault, Defender};
 	public Mode mode = Mode.Tunneler;
 
+	public enum Carriage {Tunneler, Miner, Fuel, Torpedos, Cargo, Engine};
+	public Carriage[] carriages;
+
 	void Start(){
 		moves = 0;
 		trains.Add(this);

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TrainDesigner : MonoBehaviour {
 	public GameObject trainPrefab;
@@ -7,7 +8,10 @@ public class TrainDesigner : MonoBehaviour {
 	public GameObject trainBody;
 
 	Train.Mode mode = Train.Mode.Tunneler;
+
 	Minerals.Ores body = Minerals.Ores.Steel;
+	List<Train.Carriage> carriages = new List<Train.Carriage>();
+	Train.Carriage lookAtCar = Train.Carriage.Tunneler;
 
 	void Start(){
 		cam.gameObject.SetActive(false);
@@ -23,7 +27,14 @@ public class TrainDesigner : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		if (Player.currentGameMode!=Player.GameMode.Design)		return;
+		if (Player.currentGameMode!=Player.GameMode.Design){
+			if (carriages.Count!=2){
+				carriages.Clear();
+				carriages.Add(Train.Carriage.Tunneler);
+				carriages.Add(Train.Carriage.Engine);
+			}
+			return;
+		}
 
 		GUI.skin = Interface.local.skin;
 		GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
@@ -34,6 +45,7 @@ public class TrainDesigner : MonoBehaviour {
 		for(int i=0; i<mineralCosts.Length; i++)	mineralCosts[i]=0;
 		mineralCosts[(int)Minerals.Ores.Steel] += 10;
 
+		/*
 		//mode
 		GUILayout.BeginVertical(GUILayout.Width(300));
 		GUILayout.FlexibleSpace();
@@ -76,7 +88,7 @@ public class TrainDesigner : MonoBehaviour {
 			break;
 		}
 		GUILayout.EndHorizontal();
-		GUILayout.EndVertical();
+		GUILayout.EndVertical();*/
 
 		//body
 		GUILayout.BeginVertical(GUILayout.Width(300));
@@ -91,15 +103,32 @@ public class TrainDesigner : MonoBehaviour {
 			}
 		}
 		GUILayout.EndVertical();
+//		string text = body.ToString()+
 		switch(body){
+		case Minerals.Ores.Diamond:
+			GUILayout.Box("Daimond\n" +
+			              "Stronest and highest heat resistance of all materials. However, extremely rare.");
+			mineralCosts[(int)Minerals.Ores.Diamond] += 20;
+			break;
+		case Minerals.Ores.Titanium:
+			GUILayout.Box("Titanium\n" +
+			              "Strong and high heat resistance while still being quite light.");
+			mineralCosts[(int)Minerals.Ores.Diamond] += 20;
+			break;
+		case Minerals.Ores.Chromium:
+			GUILayout.Box("Chromium\n" +
+			              "Stronest and highest heat resistance of all materials. However, extremely rare.");
+			mineralCosts[(int)Minerals.Ores.Diamond] += 20;
+			break;
 		case Minerals.Ores.Steel:
 			GUILayout.Box("Steel\n" +
-			              "Very readily available and stil quite strong and resistent.");
+			              "Strong and resistent material with medium heat resistance.");
 			mineralCosts[(int)Minerals.Ores.Steel] += 20;
 			break;
 		case Minerals.Ores.Aluminium:
 			GUILayout.Box("Aluminim\n" +
-			              "Being light, this allows trains to move faster than normal. However, it is weaker than other materials.");
+			              "Being light, this allows trains to move faster than normal. However, it is weaker" +
+			              "and has a very low heat resistance..");
 			mineralCosts[(int)Minerals.Ores.Aluminium] += 20;
 			break;
 		case Minerals.Ores.Gold:
@@ -116,7 +145,7 @@ public class TrainDesigner : MonoBehaviour {
 		case Minerals.Ores.Tungsten:
 			GUILayout.Box("Tungsten\n" +
 				              "With an incredibly high melting point Tungsten helps protect against the heat lower underground. " +
-				              "It is also stronger than steel, but heavier and thus slower.");
+				              "It is also very strong, but heavier and thus slower.");
 			mineralCosts[(int)Minerals.Ores.Tungsten] += 20;
 			break;
 		case Minerals.Ores.Uranium:
@@ -126,6 +155,65 @@ public class TrainDesigner : MonoBehaviour {
 			break;
 		}
 		GUILayout.EndHorizontal();
+		GUILayout.EndVertical();
+
+		//add carriages
+		GUILayout.BeginVertical(GUILayout.Width(300));
+		GUILayout.FlexibleSpace();
+		GUILayout.Box("Add Carriage");
+		GUILayout.BeginHorizontal();
+		GUILayout.BeginVertical(GUILayout.Width(100));
+		for(int i=0; i<6; i++){
+			if (GUILayout.Button(((Train.Carriage)i).ToString())){
+				lookAtCar = (Train.Carriage)i;
+
+			}
+		}
+		GUILayout.EndVertical();
+		GUILayout.BeginVertical();
+		switch(lookAtCar){
+		case Train.Carriage.Miner:
+			GUILayout.Box("Miner\n" +
+			              "Station trains with mining units next to minerals to slowly harvest them.");
+			break;
+		case Train.Carriage.Tunneler:
+			GUILayout.Box("Tunneler\n" +
+			              "Necessary to create new tunnels in the rock. Must be at front or back!");
+			break;
+		case Train.Carriage.Cargo:
+			GUILayout.Box("Cargo\n" +
+			              "Increases train cargo capacity, allowing it to carry more minerals.");
+			break;
+		case Train.Carriage.Engine:
+			GUILayout.Box("Engine\n" +
+			              "Vital compoonent that drives your train. Add more to increase train speed.");
+			break;
+		case Train.Carriage.Fuel:
+			GUILayout.Box("Fuel\n" +
+			              "Additional fuel tanks to allow trains to last longer away from home.");
+			break;
+		case Train.Carriage.Torpedos:
+			GUILayout.Box("Torpedos\n" +
+			              "Strong weapons for defending trains and destroying others.");
+			break;
+		}
+		if (GUILayout.Button("Add")){
+			carriages.Add(lookAtCar);
+		}
+		GUILayout.EndVertical();
+		GUILayout.EndHorizontal();
+		GUILayout.EndVertical();
+
+		//carriage list
+		GUILayout.BeginVertical();
+		GUILayout.FlexibleSpace();
+		GUILayout.Box("Carriages");
+		for(int i=0; i<carriages.Count; i++){
+			if (GUILayout.Button(carriages[i].ToString())){
+				carriages.RemoveAt(i);
+				break;
+			}
+		}
 		GUILayout.EndVertical();
 
 		//cost
