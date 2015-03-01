@@ -2,24 +2,18 @@
 using System.Collections;
 
 public class CameraMgr : MonoBehaviour {
-	public GameObject initSelected;
-	public static GameObject selected;
 	Vector3 focus = Vector3.zero;
 	float ax = 45;
 	float ay = 45;
 	float zoom = 50f;
-	bool canClick = false;
 
 	const float mouseRotSens = 100;
 
-	void Awake(){
-		selected = initSelected;
-	}
-
 	void Update(){
-		if (selected != null) {
-			focus = Vector3.Lerp(focus, selected.transform.position, Time.deltaTime*10);
+		if (Selector.selected != null) {
+			focus = Vector3.Lerp(focus, Selector.selected.transform.position, Time.deltaTime*10);
 		}
+		if (Player.currentGameMode==Player.GameMode.Design)		focus = Vector3.zero;
 		transform.position = focus;
 		transform.rotation = Quaternion.Euler(ax, ay, 0);
 		transform.Translate (0, 0, -zoom);
@@ -28,35 +22,13 @@ public class CameraMgr : MonoBehaviour {
 			ax -= Input.GetAxis("Mouse Y")*Time.deltaTime*mouseRotSens;
 			ay += Input.GetAxis("Mouse X")*Time.deltaTime*mouseRotSens;
 		}
+
+		/*if (Player.currentGameMode==Player.GameMode.Design){
+			zoom = Mathf.Lerp(zoom, 1, Time.deltaTime*10);
+			return;
+		}*/
+
 		zoom -= Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*2000f;
-		zoom = Mathf.Clamp (zoom, 10, 100);
-
-		if (!Input.GetMouseButton(0))	canClick = true;
-
-		if (Input.GetMouseButton (0) && canClick) {
-			canClick = false;
-			Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit)){
-				selected = hit.collider.gameObject;
-				if (selected.GetComponent<Train>()!=null){
-					selected.GetComponent<Train>().Select();
-				}
-				if (selected.GetComponent<Marker>()!=null){
-					selected.GetComponent<Marker>().Select();
-				}
-			}
-		}
-	}
-
-	void OnGUI(){
-		if (selected != null) {
-			GUILayout.BeginArea(new Rect(0, 0, 500, Screen.height));
-			GUILayout.FlexibleSpace();
-			if (selected.GetComponent<Colony>()!=null)	selected.GetComponent<Colony>().Window();
-			if (selected.GetComponent<Train>()!=null)	selected.GetComponent<Train>().Window();
-			if (selected.GetComponent<Minerals>()!=null)	selected.GetComponent<Minerals>().Window();
-			GUILayout.EndArea();
-		}
+		zoom = Mathf.Clamp (zoom, 10, 300);
 	}
 }

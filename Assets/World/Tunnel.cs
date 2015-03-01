@@ -12,10 +12,12 @@ public class Tunnel : MonoBehaviour {
 	Vector3 normEnd = Vector3.forward;
 
 	void Start(){
+		life = Random.Range(5,15);
 		tunnels.Add(this);
 	}
 
 	public void NextTurn(){
+		if (gameObject==null)	return;
 		life--;
 		if (life<=0){
 			Destroy(gameObject);
@@ -25,8 +27,8 @@ public class Tunnel : MonoBehaviour {
 	public static Tunnel Find(Vector3 A, Vector3 B, Vector3 norm){
 		foreach(Tunnel tun in tunnels){
 			if (tun!=null){
-				if (tun.start==A && norm==tun.normStart && tun.end==B)		return tun;
-				if (tun.start==B && tun.end==A && norm==tun.normEnd)		return tun;
+				if ((tun.start-A).sqrMagnitude<1 && (norm-tun.normStart).sqrMagnitude<1 && (tun.end-B).sqrMagnitude<1)		return tun;
+				if ((tun.start-B).sqrMagnitude<1 && (tun.end-A).sqrMagnitude<1 && (norm-tun.normEnd).sqrMagnitude<1)		return tun;
 			}
 		}
 		return null;
@@ -51,14 +53,18 @@ public class Tunnel : MonoBehaviour {
 
 		if ((end-start).normalized==direct){
 			for(int i=1; i<15; i++){
-				line.SetPosition(i, direct*(float)i/14f*10);
+				Vector3 pos = direct*(float)i/14f*10;
+				if (i>0 && i<14)	pos += Random.rotation*Vector3.up/10f;
+				line.SetPosition(i, pos);
 			}
 			normStart = direct;
 			normEnd = -direct;
 		}else{
 			for(int i=1; i<15; i++){
 				float angle = (float)i*3.1415f/2/14f;
-				line.SetPosition(i, new Vector3(0,10-Mathf.Cos(angle)*10,Mathf.Sin(angle)*10));
+				Vector3 pos = new Vector3(0,10-Mathf.Cos(angle)*10,Mathf.Sin(angle)*10);
+				if (i>0 && i<14)	pos += Random.rotation*Vector3.up/10f;
+				line.SetPosition(i, pos);
 			}
 			transform.rotation = Quaternion.LookRotation(direct, end-(start+direct*10));
 			normStart = direct;

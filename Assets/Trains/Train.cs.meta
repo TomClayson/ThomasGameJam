@@ -2,7 +2,9 @@ fileFormatVersion: 2
 guid: 8b25a32ee62f58a4eb806b54d4496eee
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - markerPrefab: {fileID: 100002, guid: 8f8df938c73cfc743a37784eb664db1d, type: 2}
+  - buildingPrefab: {fileID: 100002, guid: 6427297b4d84ffd4a93c7db629567678, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

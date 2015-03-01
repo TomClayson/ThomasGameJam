@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	public static int turn = 1;
+	public enum GameMode {Menu, Game, Design};
+	public static GameMode currentGameMode = GameMode.Game;
 
 	public static float wealth = 1000;
 

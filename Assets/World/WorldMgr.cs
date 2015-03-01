@@ -20,11 +20,11 @@ public class WorldMgr : MonoBehaviour {
 	}
 
 	public void Generate(){
-		for(int j=0; j<10; j++){
+		for(int j=0; j<3; j++){
 			Vector3 direction = Quaternion.Euler(Random.Range(0,4)*90, Random.Range(0,4)*90, Random.Range(0,4)*90) *transform.up;
 
 			Vector3 pos = Vector3.zero;
-			for(int i=0; i<5; i++){
+			for(int i=0; i<3; i++){
 				Vector3 oldPos = pos;
 				Vector3 olddirect = direction;
 				direction = Quaternion.Euler(Random.Range(-1,1)*90, Random.Range(-1,1)*90, Random.Range(-1,1)*90) *direction;
@@ -36,7 +36,7 @@ public class WorldMgr : MonoBehaviour {
 
 		//place minerals
 		for (int i=0; i<5; i++){
-			Vector3 pos = new Vector3(Random.Range(-2,2), Random.Range(-2,2), Random.Range(-2,2))*10;
+			Vector3 pos = new Vector3(Random.Range(-5,5), Random.Range(-5,5), Random.Range(-5,5))*10;
 			bool validMin = true;
 			foreach(Minerals mineral in minerals){
 				if (mineral.transform.position==pos){
