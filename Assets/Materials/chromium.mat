@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: lead
+  m_Name: chromium
   m_Shader: {fileID: 22, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
@@ -36,12 +36,12 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .156862751, g: .156862751, b: .156862751, a: 1}
+        second: {r: .784313738, g: .784313738, b: .784313738, a: 1}
       data:
         first:
           name: _SpecColor
-        second: {r: .196078435, g: .196078435, b: .196078435, a: 1}
+        second: {r: 1, g: 1, b: 1, a: 1}
       data:
         first:
           name: _ReflectColor
-        second: {r: .196078435, g: .196078435, b: .196078435, a: .501960814}
+        second: {r: 1, g: 1, b: 1, a: .501960814}

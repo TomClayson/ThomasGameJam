@@ -9,8 +9,8 @@ public class Marker : MonoBehaviour {
 
 	void Start(){
 		switch(currentMode){
-		case Modes.Movement:	renderer.material.SetColor("_Color",Color.green);		break;
-		case Modes.Attack:		renderer.material.SetColor("_Color",Color.red);			break;
+		case Modes.Movement:	renderer.material.SetColor("_Color",new Color(0,0.8f,0,0.6f));		break;
+		case Modes.Attack:		renderer.material.SetColor("_Color",new Color(1,0,0,0.6f));			break;
 		}
 	}
 

@@ -17,12 +17,11 @@ public class Train : MonoBehaviour {
 	public Minerals.Ores body = Minerals.Ores.Steel;
 	public float health = 1;
 	public int moves = 1;
+	int miners = 0;
+	int tunnelers = 0;
+	int builders = 0;
 	public int totalMoves = 3;
 
-	public enum Mode {Tunneler, Miner, Builder, Assault, Defender};
-	public Mode mode = Mode.Tunneler;
-
-	public enum Carriage {Tunneler, Miner, Fuel, Torpedos, Cargo, Engine};
 	public Carriage[] carriages;
 
 	void Start(){
@@ -32,17 +31,23 @@ public class Train : MonoBehaviour {
 		normal = transform.forward;
 		target = position;
 
-		totalMoves = 3;
-		switch(body){
-		case Minerals.Ores.Aluminium:	totalMoves = 4;		break;
-		case Minerals.Ores.Tungsten:	totalMoves = 2;		break;
-		case Minerals.Ores.Lead:		totalMoves = 1;		break;
-		case Minerals.Ores.Uranium:		totalMoves = 2;		break;
-		case Minerals.Ores.Gold:		totalMoves = 2;		break;
+		for (int i=0; i<carriages.Length; i++) {
+			if (carriages[i]!=null){
+				carriages[i].renderer.material = WorldMgr.local.minMats[(int)body];
+				if (carriages[i].mode==Carriage.Mode.Miner)		miners++;
+				if (carriages[i].mode==Carriage.Mode.Tunneler)	tunnelers++;
+				if (carriages[i].mode==Carriage.Mode.Builder)	builders++;
+			}
 		}
+
 	}
 
 	void Update(){
+		//carriage manager
+		for (int i=0; i<carriages.Length; i++) {
+			if (carriages[i]!=null)		carriages[i].transform.localPosition = new Vector3(0,0,-i);
+		}
+
 		if (target!=position){
 			//make new tunnel
 			if (Tunnel.Find(position,target,normal)==null){
@@ -141,11 +146,11 @@ public class Train : MonoBehaviour {
 		moves = totalMoves;
 
 		//mining
-		if (mode==Mode.Miner){
+		if (miners>0){
 			foreach(Minerals min in WorldMgr.minerals){
 				if (min!=null){
 					if ((min.transform.position-position).sqrMagnitude<1){
-						float delta = Mathf.Min(5, min.amount);
+						float delta = Mathf.Min(5*miners, min.amount);
 						min.amount -= delta;
 						Player.minerals[(int)min.ore] += delta;
 					}
@@ -242,7 +247,7 @@ public class Train : MonoBehaviour {
 
 	bool ValidMovePos(Vector3 pos){
 		if (Find(pos))	return false;
-		if (mode==Mode.Tunneler)	return true;
+		if (tunnelers>0)	return true;
 		if (Tunnel.Find(position, pos, normal)!=null)	return true;
 		if (Tunnel.Find(position, pos, -normal)!=null)	return true;
 		return false;
@@ -250,7 +255,7 @@ public class Train : MonoBehaviour {
 
 	bool ValidMoveBuilding(Vector3 pos){
 		if (Find(pos))	return false;
-		if (mode==Mode.Tunneler)	return true;
+		if (tunnelers>0)	return true;
 		if (Tunnel.Find(position, pos)!=null)	return true;
 		if (Tunnel.Find(position, pos)!=null)	return true;
 		return false;
@@ -264,19 +269,35 @@ public class Train : MonoBehaviour {
 	}
 
 	public void Window(){
+		GUILayout.BeginHorizontal ();
+
 		GUILayout.BeginVertical(GUILayout.Width(200));
+		GUILayout.FlexibleSpace();
 		GUILayout.Box (name);
 		GUILayout.Box ("Health "+Mathf.Floor(health*100).ToString());
 		GUILayout.Box ("Moves " +moves.ToString()+ " / " + totalMoves.ToString());
-		GUILayout.Box (mode.ToString ());
-		if (mode==Mode.Builder){
+		if (builders>0){
 			if (GUILayout.Button("Build Colony")){
 				Building build = ((GameObject)Instantiate(buildingPrefab)).GetComponent<Building>();
 				build.transform.position = position;
 				Selector.selected = build.gameObject;
-				Destroy(gameObject);
+				builders--;
+				for (int i=0; i<carriages.Length; i++) {
+					if(carriages[i].mode==Carriage.Mode.Builder){
+						carriages[i].mode = Carriage.Mode.Spent;
+						break;
+					}
+				}
 			}
 		}
 		GUILayout.EndVertical();
+
+		GUILayout.BeginVertical(GUILayout.Width(150));
+		GUILayout.FlexibleSpace();
+		for (int i=0; i<carriages.Length; i++) {
+			GUILayout.Box(carriages[i].mode.ToString());
+		}
+		GUILayout.EndVertical();
+		GUILayout.EndHorizontal ();
 	}
 }

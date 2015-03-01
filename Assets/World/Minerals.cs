@@ -22,6 +22,7 @@ public class Minerals : MonoBehaviour {
 		330,
 		660,
 		3420,
+		1090,
 		1670,
 		1910,
 		4440
