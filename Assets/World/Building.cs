@@ -5,10 +5,11 @@ using System.Collections.Generic;
 public class Building : MonoBehaviour {
 	public static List<Building> buildings = new List<Building>();
 	float health = 1;
-	float population = 1000;
+	float population = 100;
 
 	void Start(){
 		buildings.Add(this);
+		population = Random.Range(300,500);
 	}
 
 	public void Window(){
@@ -41,5 +42,6 @@ public class Building : MonoBehaviour {
 	public void NextTurn(){
 		population += Random.Range(100,200);
 		health = Mathf.Clamp01(health+0.1f);
+		Player.wealth += population/10f;
 	}
 }

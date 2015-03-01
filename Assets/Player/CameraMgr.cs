@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class CameraMgr : MonoBehaviour {
+	public Gradient background;
 	Vector3 focus = Vector3.zero;
 	float ax = 45;
 	float ay = 45;
@@ -10,6 +11,9 @@ public class CameraMgr : MonoBehaviour {
 	const float mouseRotSens = 100;
 
 	void Update(){
+		if (Player.currentGameMode!=Player.GameMode.Design)
+			camera.backgroundColor = background.Evaluate(Mathf.Clamp01(focus.y/500+0.5f));
+
 		if (Selector.selected != null) {
 			focus = Vector3.Lerp(focus, Selector.selected.transform.position, Time.deltaTime*10);
 		}

@@ -49,8 +49,8 @@ public class TrainDesigner : MonoBehaviour {
 		switch(mode){
 		case  Train.Mode.Tunneler:
 			GUILayout.Box("Tunneler\n" +
-				"With a giant boring face, these trains can drill through dense rock quickly and carve out " +
-				"tunnels for other trains to then follow. They are armoured a little.");
+						"With a giant boring face, these trains can drill through dense rock quickly and create " +
+						"tunnels for other trains. They have small amounts of armour.");
 			break;
 		case  Train.Mode.Miner:
 			GUILayout.Box("Miner\n" +
@@ -64,8 +64,15 @@ public class TrainDesigner : MonoBehaviour {
 			break;
 		case  Train.Mode.Assault:
 			GUILayout.Box("Assault\n" +
-			              "By mounting heavy armour and weapons onto trains, a new kind of deadly warfare has been created.");
+			              "By mounting heavy weapons onto trains, a new deadly weapon has been created, capable " +
+			              "easily destroying other trains..");
 			mineralCosts[(int)Minerals.Ores.Uranium] += 2;
+			break;
+		case  Train.Mode.Defender:
+			GUILayout.Box("Defender\n" +
+			              "Super stron heavy armour protects this train and those behing it against all but " +
+			              "overwhelming forces.");
+			mineralCosts[(int)Minerals.Ores.Steel] += 5;
 			break;
 		}
 		GUILayout.EndHorizontal();

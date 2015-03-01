@@ -19,7 +19,7 @@ public class Train : MonoBehaviour {
 	public int moves = 1;
 	public int totalMoves = 3;
 
-	public enum Mode {Tunneler, Miner, Builder, Assault};
+	public enum Mode {Tunneler, Miner, Builder, Assault, Defender};
 	public Mode mode = Mode.Tunneler;
 
 	void Start(){
@@ -142,7 +142,7 @@ public class Train : MonoBehaviour {
 			foreach(Minerals min in WorldMgr.minerals){
 				if (min!=null){
 					if ((min.transform.position-position).sqrMagnitude<1){
-						float delta = Mathf.Max(5, min.amount);
+						float delta = Mathf.Min(5, min.amount);
 						min.amount -= delta;
 						Player.minerals[(int)min.ore] += delta;
 					}
@@ -183,10 +183,12 @@ public class Train : MonoBehaviour {
 				case 16:	pos += Vector3.left*10 + Vector3.back*10;	break;
 				case 17:	pos += Vector3.left*10 - Vector3.back*10;	break;
 				}
-				Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
-				newMark.train = this;
-				newMark.transform.position = pos;
-				markers.Add(newMark);
+				if (ValidMoveBuilding(pos)){
+					Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
+					newMark.train = this;
+					newMark.transform.position = pos;
+					markers.Add(newMark);
+				}
 			}
 			return;
 		}
@@ -213,6 +215,7 @@ public class Train : MonoBehaviour {
 				Marker newMark = ((GameObject)Instantiate(markerPrefab)).GetComponent<Marker>();
 				newMark.train = this;
 				newMark.transform.position = pos;
+				newMark.currentMode = Marker.Modes.Movement;
 				markers.Add(newMark);
 			}
 		}
@@ -235,10 +238,26 @@ public class Train : MonoBehaviour {
 	}
 
 	bool ValidMovePos(Vector3 pos){
+		if (Find(pos))	return false;
 		if (mode==Mode.Tunneler)	return true;
 		if (Tunnel.Find(position, pos, normal)!=null)	return true;
 		if (Tunnel.Find(position, pos, -normal)!=null)	return true;
 		return false;
+	}
+
+	bool ValidMoveBuilding(Vector3 pos){
+		if (Find(pos))	return false;
+		if (mode==Mode.Tunneler)	return true;
+		if (Tunnel.Find(position, pos)!=null)	return true;
+		if (Tunnel.Find(position, pos)!=null)	return true;
+		return false;
+	}
+
+	Train Find(Vector3 pos){
+		foreach(Train train in trains){
+			if ((train.position-pos).sqrMagnitude<1)	return train;
+		}
+		return null;
 	}
 
 	public void Window(){
