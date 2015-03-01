@@ -26,8 +26,6 @@ public class Interface : MonoBehaviour {
 			Train.trains.TrimExcess();
 
 		}
-		Debug.Log(Tunnel.tunnels.Count);
-
 		GUILayout.EndArea ();
 	}
 }

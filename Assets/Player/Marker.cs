@@ -7,7 +7,6 @@ public class Marker : MonoBehaviour {
 	public void Select(){
 		CameraMgr.selected = train.gameObject;
 		train.target = transform.position;
-		Debug.Log("move");
 		train.moves--;
 		train.Deselect();
 	}
